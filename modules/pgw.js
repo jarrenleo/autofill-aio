@@ -1,0 +1,91 @@
+function generateRandomName() {
+  return window.names[Math.floor(Math.random() * window.names.length)];
+}
+
+function waitForElement(selector, callback) {
+  const observer = new MutationObserver((_, observer) => {
+    const targetElement = document.querySelector(selector);
+    if (targetElement) {
+      observer.disconnect();
+      callback(targetElement);
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+}
+
+function fillInput(selector, value) {
+  const input =
+    typeof selector === "string" ? document.querySelector(selector) : selector;
+
+  if (input) {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
+function formatCardNumber(cardNumber) {
+  // Remove any existing dashes or spaces
+  const cleanNumber = cardNumber.replace(/[-\s]/g, "");
+  // Add dash every 4 digits
+  return cleanNumber.match(/.{1,4}/g)?.join("-") || cleanNumber;
+}
+
+async function runAutofill() {
+  const result = await chrome.storage.sync.get([
+    "autofillProfiles",
+    "activeProfileName",
+  ]);
+  const profiles = result.autofillProfiles;
+  const activeProfileName = result.activeProfileName;
+
+  if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
+
+  const details = profiles[activeProfileName];
+
+  const firstName = details.name;
+  const lastName = generateRandomName();
+  const fullName = `${firstName} ${lastName}`;
+
+  waitForElement("input[id='tel-cardNumber']", (selector) => {
+    selector.focus();
+    fillInput(selector, formatCardNumber(details.cardNumber));
+  });
+
+  waitForElement("input[id='expyear']", (selector) => {
+    selector.focus();
+    fillInput(selector, `${details.cardExpiryMonth}/${details.cardExpiryYear}`);
+  });
+
+  waitForElement("input[id='tel-cvv']", (selector) => {
+    selector.focus();
+    fillInput(selector, details.cardCvv);
+  });
+
+  waitForElement("input[id='name']", (selector) => {
+    selector.focus();
+    fillInput(selector, fullName);
+  });
+
+  waitForElement("input[id='email-email']", (selector) => {
+    selector.focus();
+    fillInput(
+      selector,
+      `${fullName.split(" ").join(".").toLowerCase()}@sagimail.com`
+    );
+  });
+
+  chrome.storage.sync.get("toPayEnabled", (result) => {
+    const toPayEnabled =
+      result.toPayEnabled !== undefined ? result.toPayEnabled : true;
+
+    if (toPayEnabled)
+      waitForElement("button[type='submit']", (selector) => selector.click());
+  });
+}
+
+runAutofill();

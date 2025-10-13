@@ -4,6 +4,7 @@ const allowedUrlPatterns = [
   /^https:\/\/.*\.bookmyshow\.com\/checkout\/patron/,
   /^https:\/\/.*\.bookmyshow\.com\/checkout\/payment/,
   /^https:\/\/.*\.reddotpayment\.com\/link\/payment\/.*/,
+  /^https:\/\/pgw-ui\.2c2p\.com\/payment\/.*/,
 ];
 
 function findUrlPatternIndex(url) {
@@ -26,6 +27,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     chrome.scripting.executeScript({
       target: { tabId: tabId },
       files: ["utils/names_array.js", "modules/reddot.js", "content.js"],
+    });
+    return;
+  }
+
+  if (urlPatternIndex === 5) {
+    chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ["utils/names_array.js", "modules/pgw.js", "content.js"],
     });
     return;
   }
