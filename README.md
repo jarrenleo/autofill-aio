@@ -7,7 +7,7 @@ Chrome extension that automatically fills checkout forms on ticketing and paymen
 - **🔄 Multi-Profile Management** - Create, switch between, import, and export multiple autofill profiles
 - **💳 Smart Payment Autofill** - Automatically fills personal details, contact information, and payment card data
 - **🎯 Platform Support**
-  - BigTix (bigtix.io)
+  - BigTix Payment Gateway (bigtix.io)
   - RedDot Payment Gateway (reddotpayment.com)
   - PGW Payment Gateway (pgw-ui.2c2p.com)
 - **📸 Screenshot Capture** - Automatically captures cart summary before proceeding to payment
