@@ -2,6 +2,30 @@ function generateRandomName() {
   return window.names[Math.floor(Math.random() * window.names.length)];
 }
 
+// Function to generate a random string of letters
+function generateRandomLetters(length) {
+  let result = "";
+  const characters = "abcdefghijklmnopqrstuvwxyz";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+}
+
+// Function to generate a random string of numbers
+function generateRandomNumbers(length) {
+  let result = "";
+  const numbers = "0123456789";
+  const numbersLength = numbers.length;
+  for (let i = 0; i < length; i++) {
+    result += numbers.charAt(Math.floor(Math.random() * numbersLength));
+  }
+
+  return result;
+}
+
 function waitForElement(selector, callback) {
   const observer = new MutationObserver((_, observer) => {
     const targetElement = document.querySelector(selector);

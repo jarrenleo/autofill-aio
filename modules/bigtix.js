@@ -1,3 +1,7 @@
+function generateRandomName() {
+  return window.names[Math.floor(Math.random() * window.names.length)];
+}
+
 // Function to generate a random string of letters
 function generateRandomLetters(length) {
   let result = "";
@@ -26,10 +30,6 @@ function generateRandomNumbers(length) {
   }
 
   return result;
-}
-
-function generateRandomName() {
-  return window.names[Math.floor(Math.random() * window.names.length)];
 }
 
 // Function to wait for an element using MutationObserver
@@ -121,7 +121,7 @@ async function selectNextButton(selector) {
 
     const hasDisabledClasses =
       targetElement.classList.contains("bigtix-button--disabled") ||
-      targetElement.classList.contains("bigtix-booking-pagenav-disabled");
+      targetElement.classList.contains("bigtix-booking-`pagenav-disabled");
     if (hasDisabledClasses) return;
 
     clearInterval(checkNextButton);
