@@ -95,9 +95,28 @@
     <hr class="my-4 border-zinc-700" />
 
     <form id="settingsForm" class="space-y-3">
-      <h4 class="text-sm font-semibold text-zinc-100">Personal Details</h4>
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-semibold text-zinc-100">Personal Details</h4>
+        <div class="flex items-center gap-2">
+          <label
+            for="customDetailsToggle"
+            class="text-sm font-medium text-zinc-100"
+            >Custom</label
+          >
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="customDetailsToggle"
+              class="sr-only peer"
+            />
+            <div
+              class="w-11 h-6 bg-zinc-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zinc-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"
+            ></div>
+          </label>
+        </div>
+      </div>
 
-      <div class="grid grid-cols-2 gap-4">
+      <div id="nameGrid" class="grid grid-cols-1 gap-4">
         <div>
           <label for="firstName" class="text-sm font-medium text-zinc-100"
             >First Name</label
@@ -108,7 +127,7 @@
             class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
           />
         </div>
-        <div>
+        <div id="lastNameDiv" class="hidden">
           <label for="lastName" class="text-sm font-medium text-zinc-100"
             >Last Name</label
           >
@@ -120,61 +139,66 @@
         </div>
       </div>
 
-      <div>
-        <label for="email" class="text-sm font-medium text-zinc-100"
-          >Email</label
-        >
-        <input
-          type="email"
-          id="email"
-          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
-        />
-      </div>
+      <!-- Custom Details Section -->
+      <div id="customDetailsSection" class="hidden space-y-3">
+        <div>
+          <label for="email" class="text-sm font-medium text-zinc-100"
+            >Email</label
+          >
+          <input
+            type="email"
+            id="email"
+            class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+          />
+        </div>
 
-      <div>
-        <label for="phoneCountry" class="text-sm font-medium text-zinc-100"
-          >Phone Country</label
-        >
-        <input
-          type="text"
-          id="phoneCountry"
-          placeholder="e.g. Malaysia"
-          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
-        />
-      </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="phoneCountry" class="text-sm font-medium text-zinc-100"
+              >Phone Country</label
+            >
+            <input
+              type="text"
+              id="phoneCountry"
+              placeholder="e.g. Malaysia"
+              class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+            />
+          </div>
+          <div>
+            <label for="phoneNumber" class="text-sm font-medium text-zinc-100"
+              >Phone Number</label
+            >
+            <input
+              type="tel"
+              id="phoneNumber"
+              class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+            />
+          </div>
+        </div>
 
-      <div>
-        <label for="phoneNumber" class="text-sm font-medium text-zinc-100"
-          >Phone Number</label
-        >
-        <input
-          type="tel"
-          id="phoneNumber"
-          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
-        />
-      </div>
-
-      <div>
-        <label for="ic" class="text-sm font-medium text-zinc-100"
-          >IC / Passport Number</label
-        >
-        <input
-          type="text"
-          id="ic"
-          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
-        />
-      </div>
-
-      <div>
-        <label for="nationality" class="text-sm font-medium text-zinc-100"
-          >Nationality</label
-        >
-        <input
-          type="text"
-          id="nationality"
-          placeholder="e.g. Malaysian"
-          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
-        />
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="nationality" class="text-sm font-medium text-zinc-100"
+              >Nationality</label
+            >
+            <input
+              type="text"
+              id="nationality"
+              placeholder="e.g. Malaysian"
+              class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+            />
+          </div>
+          <div>
+            <label for="ic" class="text-sm font-medium text-zinc-100"
+              >IC / Passport Number</label
+            >
+            <input
+              type="text"
+              id="ic"
+              class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+            />
+          </div>
+        </div>
       </div>
 
       <hr class="my-4 border-zinc-700" />

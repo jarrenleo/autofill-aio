@@ -18,9 +18,57 @@ const profileSelect = document.getElementById("profileSelect");
 const newProfileBtn = document.getElementById("newProfileBtn");
 const deleteProfileBtn = document.getElementById("deleteProfileBtn");
 const toPayToggle = document.getElementById("toPayToggle");
+const customDetailsToggle = document.getElementById("customDetailsToggle");
+const customDetailsSection = document.getElementById("customDetailsSection");
+const nameGrid = document.getElementById("nameGrid");
+const lastNameDiv = document.getElementById("lastNameDiv");
 const exportProfilesBtn = document.getElementById("exportProfilesBtn");
 const importProfilesBtn = document.getElementById("importProfilesBtn");
 const importProfilesInput = document.getElementById("importProfilesInput");
+
+// Function to check if custom details are filled for a profile
+function hasCustomDetails(profileData) {
+  return (
+    profileData?.lastName ||
+    profileData?.email ||
+    profileData?.phoneCountry ||
+    profileData?.phoneNumber ||
+    profileData?.ic ||
+    profileData?.nationality
+  );
+}
+
+// Function to get profile display name with indicator
+function getProfileDisplayName(profileName, profiles) {
+  return profileName;
+}
+
+// Function to toggle custom details section visibility
+function toggleCustomDetailsSection(show) {
+  if (show) {
+    // Show custom details section
+    customDetailsSection.classList.remove("hidden");
+    // Change grid to 2 columns for First Name and Last Name side by side
+    nameGrid.classList.remove("grid-cols-1");
+    nameGrid.classList.add("grid-cols-2");
+    // Show Last Name field
+    lastNameDiv.classList.remove("hidden");
+  } else {
+    // Hide custom details section
+    customDetailsSection.classList.add("hidden");
+    // Change grid back to 1 column for First Name only
+    nameGrid.classList.remove("grid-cols-2");
+    nameGrid.classList.add("grid-cols-1");
+    // Hide Last Name field
+    lastNameDiv.classList.add("hidden");
+  }
+  customDetailsToggle.checked = show;
+}
+
+// Handle custom details toggle
+customDetailsToggle.addEventListener("change", () => {
+  toggleCustomDetailsSection(customDetailsToggle.checked);
+});
 
 // Function to load data for a specific profile into the form
 function loadProfileData(profileDetails) {
@@ -36,6 +84,10 @@ function loadProfileData(profileDetails) {
   cardExpiryYearInput.value = profileDetails?.cardExpiryYear || "";
   cardCvvInput.value = profileDetails?.cardCvv || "";
   cardTypeInput.value = profileDetails?.cardType || "VISA";
+
+  // Set the custom details toggle based on whether profile has custom details
+  const hasDetails = hasCustomDetails(profileDetails);
+  toggleCustomDetailsSection(hasDetails);
 }
 
 // Load profiles and active profile when popup opens
@@ -76,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
       profileNames.forEach((name) => {
         const option = document.createElement("option");
         option.value = name;
-        option.textContent = name;
+        option.textContent = getProfileDisplayName(name, profiles);
         if (name === activeProfileName) option.selected = true;
         profileSelect.appendChild(option);
       });
@@ -191,7 +243,7 @@ newProfileBtn.addEventListener("click", () => {
         if (!existingOption) {
           const option = document.createElement("option");
           option.value = trimmedName;
-          option.textContent = trimmedName;
+          option.textContent = getProfileDisplayName(trimmedName, profiles);
           profileSelect.appendChild(option);
         }
         // Select the new/existing profile
@@ -263,7 +315,7 @@ importProfilesInput.addEventListener("change", (event) => {
             Object.keys(profiles).forEach((name) => {
               const option = document.createElement("option");
               option.value = name;
-              option.textContent = name;
+              option.textContent = getProfileDisplayName(name, profiles);
               profileSelect.appendChild(option);
             });
             // If there was an active profile, keep it selected if it still exists
@@ -345,7 +397,7 @@ deleteProfileBtn.addEventListener("click", () => {
         allProfileNames.forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
-          option.textContent = name;
+          option.textContent = getProfileDisplayName(name, profiles);
           if (name === nextActiveProfileName) {
             option.selected = true;
           }
