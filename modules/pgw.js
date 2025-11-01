@@ -47,9 +47,14 @@ async function runAutofill() {
 
   const details = profiles[activeProfileName];
 
-  const firstName = details.name;
-  const lastName = generateRandomName();
+  const firstName = details.firstName;
+  const lastName = details.lastName || generateRandomName();
   const fullName = `${firstName} ${lastName}`;
+  const email =
+    details.email ||
+    `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5
+    )}${generateRandomNumbers(5)}@sagimail.com`;
 
   waitForElement("input[id='tel-cardNumber']", (selector) => {
     selector.focus();
@@ -73,10 +78,7 @@ async function runAutofill() {
 
   waitForElement("input[id='email-email']", (selector) => {
     selector.focus();
-    fillInput(
-      selector,
-      `${fullName.split(" ").join(".").toLowerCase()}@sagimail.com`
-    );
+    fillInput(selector, email);
   });
 
   chrome.storage.sync.get("toPayEnabled", (result) => {

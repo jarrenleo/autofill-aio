@@ -97,11 +97,82 @@
     <form id="settingsForm" class="space-y-3">
       <h4 class="text-sm font-semibold text-zinc-100">Personal Details</h4>
 
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="firstName" class="text-sm font-medium text-zinc-100"
+            >First Name</label
+          >
+          <input
+            type="text"
+            id="firstName"
+            class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+          />
+        </div>
+        <div>
+          <label for="lastName" class="text-sm font-medium text-zinc-100"
+            >Last Name</label
+          >
+          <input
+            type="text"
+            id="lastName"
+            class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+          />
+        </div>
+      </div>
+
       <div>
-        <label for="name" class="text-sm font-medium text-zinc-100">Name</label>
+        <label for="email" class="text-sm font-medium text-zinc-100"
+          >Email</label
+        >
+        <input
+          type="email"
+          id="email"
+          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+        />
+      </div>
+
+      <div>
+        <label for="phoneCountry" class="text-sm font-medium text-zinc-100"
+          >Phone Country</label
+        >
         <input
           type="text"
-          id="name"
+          id="phoneCountry"
+          placeholder="e.g. Malaysia"
+          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+        />
+      </div>
+
+      <div>
+        <label for="phoneNumber" class="text-sm font-medium text-zinc-100"
+          >Phone Number</label
+        >
+        <input
+          type="tel"
+          id="phoneNumber"
+          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+        />
+      </div>
+
+      <div>
+        <label for="ic" class="text-sm font-medium text-zinc-100"
+          >IC / Passport Number</label
+        >
+        <input
+          type="text"
+          id="ic"
+          class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
+        />
+      </div>
+
+      <div>
+        <label for="nationality" class="text-sm font-medium text-zinc-100"
+          >Nationality</label
+        >
+        <input
+          type="text"
+          id="nationality"
+          placeholder="e.g. Malaysian"
           class="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md shadow-sm focus:outline-none focus:ring-zinc-600 focus:border-zinc-100 transition-colors sm:text-sm bg-zinc-800 text-zinc-100"
         />
       </div>

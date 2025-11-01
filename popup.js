@@ -1,10 +1,18 @@
-const nameInput = document.getElementById("name");
+const firstNameInput = document.getElementById("firstName");
+const lastNameInput = document.getElementById("lastName");
+const emailInput = document.getElementById("email");
+const phoneCountryInput = document.getElementById("phoneCountry");
+const phoneNumberInput = document.getElementById("phoneNumber");
+const icInput = document.getElementById("ic");
+const nationalityInput = document.getElementById("nationality");
+
 const cardNumberInput = document.getElementById("cardNumber");
 const cardExpiryMonthInput = document.getElementById("cardExpiryMonth");
 const cardExpiryYearInput = document.getElementById("cardExpiryYear");
 const cardCvvInput = document.getElementById("cardCvv");
 const cardTypeInput = document.getElementById("cardType");
 const saveButton = document.getElementById("save");
+
 const statusDiv = document.getElementById("status");
 const profileSelect = document.getElementById("profileSelect");
 const newProfileBtn = document.getElementById("newProfileBtn");
@@ -16,7 +24,13 @@ const importProfilesInput = document.getElementById("importProfilesInput");
 
 // Function to load data for a specific profile into the form
 function loadProfileData(profileDetails) {
-  nameInput.value = profileDetails?.name || "";
+  firstNameInput.value = profileDetails?.firstName || "";
+  lastNameInput.value = profileDetails?.lastName || "";
+  emailInput.value = profileDetails?.email || "";
+  phoneCountryInput.value = profileDetails?.phoneCountry || "";
+  phoneNumberInput.value = profileDetails?.phoneNumber || "";
+  icInput.value = profileDetails?.ic || "";
+  nationalityInput.value = profileDetails?.nationality || "";
   cardNumberInput.value = profileDetails?.cardNumber || "";
   cardExpiryMonthInput.value = profileDetails?.cardExpiryMonth || "";
   cardExpiryYearInput.value = profileDetails?.cardExpiryYear || "";
@@ -110,7 +124,13 @@ saveButton.addEventListener("click", () => {
   }
 
   const details = {
-    name: nameInput.value,
+    firstName: firstNameInput.value,
+    lastName: lastNameInput.value,
+    email: emailInput.value,
+    phoneCountry: phoneCountryInput.value,
+    phoneNumber: phoneNumberInput.value,
+    ic: icInput.value,
+    nationality: nationalityInput.value,
     cardNumber: cardNumberInput.value,
     cardExpiryMonth: cardExpiryMonthInput.value,
     cardExpiryYear: cardExpiryYearInput.value,

@@ -51,12 +51,13 @@ function waitForElement(selector, callback) {
 // Function to wait for a custom element using MutationObserver
 function waitForCustomElement(textContent, callback) {
   const currentUrl = window.location.href;
-  if (
-    !currentUrl.includes("starplanet") &&
-    !currentUrl.includes("biztmgptix") &&
-    !currentUrl.includes("bookmyshow")
-  )
-    return;
+  // if (
+  //   !currentUrl.includes("starplanet") &&
+  //   !currentUrl.includes("biztmgptix") &&
+  //   !currentUrl.includes("bookmyshow")
+  // )
+  //   return;
+  if (!currentUrl.includes("bigtix")) return;
 
   const observer = new MutationObserver((_, observer) => {
     const targetElement = findInputByLabel(textContent);
@@ -106,7 +107,8 @@ function findInputByLabel(textContent) {
   const formDiv = selectedLabel.parentElement.querySelector(
     ".bigtix-formitem__field"
   );
-  const inputField = formDiv.querySelector("input");
+  let inputField = formDiv.querySelector("input");
+  if (!inputField) inputField = formDiv.querySelector("[role='checkbox']");
 
   return inputField;
 }
@@ -140,22 +142,26 @@ async function runAutofill() {
 
   const details = profiles[activeProfileName];
 
-  const firstName = details.name;
-  const lastName = generateRandomName();
+  const firstName = details.firstName;
+  const lastName = details.lastName || generateRandomName();
   const fullName = `${firstName} ${lastName}`;
+  const email =
+    details.email ||
+    `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5
+    )}${generateRandomNumbers(5)}@sagimail.com`;
+  const phoneCountry = details.phoneCountry || "Malaysia";
+  const phoneNumber =
+    details.phoneNumber ||
+    `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
+  const ic = details.ic || "0000";
+  const nationality = details.nationality || "Malaysian";
 
   // Full Name
   waitForElement(
     "input[data-test='test-bigtix-booking--patroninfoform-fullName']",
     (selector) => fillInput(selector, fullName)
   );
-
-  const email = `${fullName
-    .split(" ")
-    .join("")
-    .toLowerCase()}.${generateRandomLetters(5)}${generateRandomNumbers(
-    5
-  )}@sagimail.com`;
 
   // Email
   waitForElement(
@@ -175,9 +181,9 @@ async function runAutofill() {
     (selector) => {
       const combobox = selector;
       combobox.focus();
-      fillInput(combobox, "Malaysia");
+      fillInput(combobox, phoneCountry);
 
-      waitForElement(`div[label="Malaysia"]`, (selector) => {
+      waitForElement(`div[label="${phoneCountry}"]`, (selector) => {
         selector.click();
         combobox.blur();
       });
@@ -187,11 +193,7 @@ async function runAutofill() {
   // Phone Number
   waitForElement(
     'input[data-test="test-bigtix-booking--patroninfoform-phone"]',
-    (phoneEl) =>
-      fillInput(
-        phoneEl,
-        `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`
-      )
+    (selector) => fillInput(selector, phoneNumber)
   );
 
   // Consent Checkbox
@@ -199,18 +201,18 @@ async function runAutofill() {
     if (selector.getAttribute("aria-checked") === "false") selector.click();
   });
 
+  // Custom Fields
+
   // NRIC
-  waitForCustomElement("Malaysian NRIC", (selector) =>
-    fillInput(selector, "0000")
-  );
+  waitForCustomElement("Malaysian NRIC", (selector) => fillInput(selector, ic));
 
   // Nationality
   waitForCustomElement("Nationality", (selector) => {
     const combobox = selector;
     combobox.focus();
-    fillInput(combobox, "Malaysian");
+    fillInput(combobox, nationality);
 
-    waitForElement(`div[label="Malaysian"]`, (selector) => {
+    waitForElement(`div[label="${nationality}"]`, (selector) => {
       selector.click();
       combobox.blur();
     });
@@ -220,9 +222,9 @@ async function runAutofill() {
   waitForCustomElement("Place of Residence", (selector) => {
     const combobox = selector;
     combobox.focus();
-    fillInput(combobox, "Singapore");
+    fillInput(combobox, phoneCountry);
 
-    waitForElement(`div[label="Singapore"]`, (selector) => {
+    waitForElement(`div[label="${phoneCountry}"]`, (selector) => {
       selector.click();
       combobox.blur();
     });
@@ -250,6 +252,16 @@ async function runAutofill() {
       selector.click();
       combobox.blur();
     });
+  });
+
+  // National Identification Card / Passport
+  waitForCustomElement("National Identification Card / Passport", (selector) =>
+    fillInput(selector, ic)
+  );
+
+  // Acknowledgement
+  waitForCustomElement("Acknowledgement", (selector) => {
+    if (selector.getAttribute("aria-checked") === "false") selector.click();
   });
 
   // Cart Summary

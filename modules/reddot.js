@@ -66,9 +66,14 @@ async function runAutofill() {
 
   const details = profiles[activeProfileName];
 
-  const firstName = details.name;
-  const lastName = generateRandomName();
+  const firstName = details.firstName;
+  const lastName = details.lastName || generateRandomName();
   const fullName = `${firstName} ${lastName}`;
+  const email =
+    details.email ||
+    `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5
+    )}${generateRandomNumbers(5)}@sagimail.com`;
 
   waitForElement(".mx-name-input_card_number", (selector) => {
     const inputElement = selector.querySelector("input");
@@ -100,10 +105,7 @@ async function runAutofill() {
   waitForElement(".mx-name-input_email", (selector) => {
     const inputElement = selector.querySelector("input");
     inputElement.focus();
-    fillInput(
-      inputElement,
-      `${fullName.split(" ").join(".").toLowerCase()}@sagimail.com`
-    );
+    fillInput(inputElement, email);
   });
 
   chrome.storage.sync.get("toPayEnabled", (result) => {
