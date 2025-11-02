@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Autofill AIO",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Chrome extension that autofills checkout forms",
   "permissions": ["storage", "scripting", "tabs", "activeTab", "downloads"],
   "host_permissions": ["<all_urls>"],

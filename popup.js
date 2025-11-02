@@ -26,40 +26,24 @@ const exportProfilesBtn = document.getElementById("exportProfilesBtn");
 const importProfilesBtn = document.getElementById("importProfilesBtn");
 const importProfilesInput = document.getElementById("importProfilesInput");
 
-// Function to check if custom details are filled for a profile
-function hasCustomDetails(profileData) {
-  return (
-    profileData?.lastName ||
-    profileData?.email ||
-    profileData?.phoneCountry ||
-    profileData?.phoneNumber ||
-    profileData?.ic ||
-    profileData?.nationality
-  );
-}
-
 // Function to get profile display name with indicator
 function getProfileDisplayName(profileName, profiles) {
-  return profileName;
+  const profileData = profiles[profileName] || {};
+  const customToggleOn = profileData.customToggleOn || false;
+  return customToggleOn ? `${profileName} (Custom)` : profileName;
 }
 
 // Function to toggle custom details section visibility
 function toggleCustomDetailsSection(show) {
   if (show) {
-    // Show custom details section
     customDetailsSection.classList.remove("hidden");
-    // Change grid to 2 columns for First Name and Last Name side by side
     nameGrid.classList.remove("grid-cols-1");
     nameGrid.classList.add("grid-cols-2");
-    // Show Last Name field
     lastNameDiv.classList.remove("hidden");
   } else {
-    // Hide custom details section
     customDetailsSection.classList.add("hidden");
-    // Change grid back to 1 column for First Name only
     nameGrid.classList.remove("grid-cols-2");
     nameGrid.classList.add("grid-cols-1");
-    // Hide Last Name field
     lastNameDiv.classList.add("hidden");
   }
   customDetailsToggle.checked = show;
@@ -68,6 +52,26 @@ function toggleCustomDetailsSection(show) {
 // Handle custom details toggle
 customDetailsToggle.addEventListener("change", () => {
   toggleCustomDetailsSection(customDetailsToggle.checked);
+
+  // Save the toggle state to the current profile
+  const activeProfileName = profileSelect.value;
+  if (activeProfileName) {
+    chrome.storage.sync.get("autofillProfiles", (result) => {
+      let profiles = result.autofillProfiles || {};
+      const profileData = profiles[activeProfileName] || {};
+      profileData.customToggleOn = customDetailsToggle.checked;
+      profiles[activeProfileName] = profileData;
+      chrome.storage.sync.set({ autofillProfiles: profiles }, () => {
+        // Update the profile dropdown text to reflect the new indicator
+        const selectedOption =
+          profileSelect.options[profileSelect.selectedIndex];
+        selectedOption.textContent = getProfileDisplayName(
+          activeProfileName,
+          profiles
+        );
+      });
+    });
+  }
 });
 
 // Function to load data for a specific profile into the form
@@ -85,9 +89,9 @@ function loadProfileData(profileDetails) {
   cardCvvInput.value = profileDetails?.cardCvv || "";
   cardTypeInput.value = profileDetails?.cardType || "VISA";
 
-  // Set the custom details toggle based on whether profile has custom details
-  const hasDetails = hasCustomDetails(profileDetails);
-  toggleCustomDetailsSection(hasDetails);
+  // Set the custom details toggle based on the profile's customToggleOn state
+  const customToggleOn = profileDetails?.customToggleOn || false;
+  toggleCustomDetailsSection(customToggleOn);
 }
 
 // Load profiles and active profile when popup opens
@@ -188,6 +192,7 @@ saveButton.addEventListener("click", () => {
     cardExpiryYear: cardExpiryYearInput.value,
     cardCvv: cardCvvInput.value,
     cardType: cardTypeInput.value,
+    customToggleOn: customDetailsToggle.checked,
   };
 
   // Get existing profiles, update the active one, and save back

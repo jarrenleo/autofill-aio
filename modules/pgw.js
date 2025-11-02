@@ -70,15 +70,16 @@ async function runAutofill() {
   if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
 
   const details = profiles[activeProfileName];
+  const customToggleOn = details.customToggleOn || false;
 
   const firstName = details.firstName;
-  const lastName = details.lastName || generateRandomName();
+  const lastName = customToggleOn ? details.lastName : generateRandomName();
   const fullName = `${firstName} ${lastName}`;
-  const email =
-    details.email ||
-    `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-      5
-    )}${generateRandomNumbers(5)}@sagimail.com`;
+  const email = customToggleOn
+    ? details.email
+    : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+        5
+      )}${generateRandomNumbers(5)}@sagimail.com`;
 
   waitForElement("input[id='tel-cardNumber']", (selector) => {
     selector.focus();

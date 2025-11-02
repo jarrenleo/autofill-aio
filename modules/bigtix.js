@@ -141,21 +141,22 @@ async function runAutofill() {
   if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
 
   const details = profiles[activeProfileName];
+  const customToggleOn = details.customToggleOn || false;
 
   const firstName = details.firstName;
-  const lastName = details.lastName || generateRandomName();
+  const lastName = customToggleOn ? details.lastName : generateRandomName();
   const fullName = `${firstName} ${lastName}`;
-  const email =
-    details.email ||
-    `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-      5
-    )}${generateRandomNumbers(5)}@sagimail.com`;
-  const phoneCountry = details.phoneCountry || "Malaysia";
-  const phoneNumber =
-    details.phoneNumber ||
-    `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
-  const ic = details.ic || "0000";
-  const nationality = details.nationality || "Malaysian";
+  const email = customToggleOn
+    ? details.email
+    : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+        5
+      )}${generateRandomNumbers(5)}@sagimail.com`;
+  const phoneCountry = customToggleOn ? details.phoneCountry : "Malaysia";
+  const phoneNumber = customToggleOn
+    ? details.phoneNumber
+    : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
+  const ic = customToggleOn ? details.ic : "0000";
+  const nationality = customToggleOn ? details.nationality : "Malaysian";
 
   // Full Name
   waitForElement(
