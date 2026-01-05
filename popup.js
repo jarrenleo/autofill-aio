@@ -1,3 +1,5 @@
+const quantityInput = document.getElementById("quantity");
+
 const firstNameInput = document.getElementById("firstName");
 const lastNameInput = document.getElementById("lastName");
 const emailInput = document.getElementById("email");
@@ -76,6 +78,7 @@ customDetailsToggle.addEventListener("change", () => {
 
 // Function to load data for a specific profile into the form
 function loadProfileData(profileDetails) {
+  quantityInput.value = profileDetails?.quantity || 1;
   firstNameInput.value = profileDetails?.firstName || "";
   lastNameInput.value = profileDetails?.lastName || "";
   emailInput.value = profileDetails?.email || "";
@@ -162,9 +165,7 @@ profileSelect.addEventListener("change", () => {
 // Save toggle state
 toPayToggle.addEventListener("change", () => {
   const isEnabled = toPayToggle.checked;
-  chrome.storage.sync.set({ toPayEnabled: isEnabled }, () => {
-    console.log(`Proceed to Payment step set to: ${isEnabled}`);
-  });
+  chrome.storage.sync.set({ toPayEnabled: isEnabled });
 });
 
 // Save settings for the CURRENTLY SELECTED profile
@@ -180,6 +181,7 @@ saveButton.addEventListener("click", () => {
   }
 
   const details = {
+    quantity: parseInt(quantityInput.value, 10) || 1,
     firstName: firstNameInput.value,
     lastName: lastNameInput.value,
     email: emailInput.value,
@@ -385,17 +387,12 @@ deleteProfileBtn.addEventListener("click", () => {
       // If no profiles left, create a new default one
       profiles["Default"] = {};
       nextActiveProfileName = "Default";
-      console.log("Last profile deleted. Created a new default profile.");
     }
 
     // Save the updated profiles and the new active profile name
     chrome.storage.sync.set(
       { autofillProfiles: profiles, activeProfileName: nextActiveProfileName },
       () => {
-        console.log(
-          `Profile "${profileNameToDelete}" deleted. Active profile set to "${nextActiveProfileName}".`
-        );
-
         // Update dropdown UI
         profileSelect.innerHTML = ""; // Clear dropdown
         const allProfileNames = Object.keys(profiles); // Get updated list including potential new 'Default'
