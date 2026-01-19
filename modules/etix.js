@@ -44,6 +44,7 @@
     if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
 
     const details = profiles[activeProfileName];
+
     const customToggleOn = details.customToggleOn || false;
 
     const firstName = details.firstName;
@@ -58,47 +59,64 @@
       ? details.phoneNumber
       : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
     const ic = customToggleOn ? details.ic : "0000";
+    const quantity = details.quantity || 1;
 
-    waitForElement("input[label='Name']", (selector) =>
-      fillInput(selector, fullName),
-    );
+    waitForElement("path[fill='#F27F4A']", (selector) => {
+      for (let i = 0; i < quantity; i++) {
+        selector.parentElement.parentElement.click();
+      }
 
-    waitForElement("input[label='Email']", (selector) =>
-      fillInput(selector, email),
-    );
+      waitForElement(
+        "button[style='background: rgb(242, 127, 74);']",
+        (selector) => {
+          selector.click();
+        },
+      );
+    });
 
-    waitForElement("input[id='telMask_']", (selector) =>
-      fillInput(selector, phoneNumber),
-    );
+    waitForElement("input[name='givenName']", (selector) => {
+      selector.focus();
+      fillInput(selector, fullName);
+    });
 
-    waitForElement("input[placeholder*='Passport' i]", (selector) => {
+    waitForElement("input[name='emailAddress']", (selector) => {
+      selector.focus();
+      fillInput(selector, email);
+    });
+
+    waitForElement("input[name='phoneNumber']", (selector) => {
+      selector.focus();
+      fillInput(selector, phoneNumber);
+    });
+
+    waitForElement("input[id='attending']", async (selector) => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      selector.click();
+    });
+
+    waitForElement("input[name='customerDocumentNumber']", (selector) => {
+      selector.focus();
       fillInput(selector, ic);
     });
 
-    waitForElement("div[id='ticket_form']", async () => {
+    waitForElement("input[id='agree1']", async (selector) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      chrome.runtime.sendMessage({ action: "screenshot" });
+      selector.click();
+    });
 
+    waitForElement("input[id='agree2']", async (selector) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      const saveAndNextButton = findAnchor("a.btn", "Save And Next");
-      saveAndNextButton.click();
+      selector.click();
+    });
 
-      const agreeProceedButton = findAnchor("a.btn", "I Agree, Proceed");
-      agreeProceedButton.click();
+    waitForElement("label[aria-label='Non-refundable Booking']", (selector) => {
+      selector.click();
 
-      waitForCustomElement("a.btn", "Make Payment", async (selector) => {
-        selector.click();
-
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        const paymentSelectionMolpay = findAnchor(
-          "label[for='paymentSelectionMolpay']",
-          "Credit/Debit Payment",
-        );
-        paymentSelectionMolpay.click();
-
-        const proceedButton = findAnchor("button.btn", "Proceed");
-        proceedButton.click();
-      });
+      waitForCustomElement(
+        "p.ml-3.w-full.flex-shrink.text-left.text-base.font-semibold",
+        "Credit / DebitCard",
+        (selector) => selector.click(),
+      );
     });
   }
 

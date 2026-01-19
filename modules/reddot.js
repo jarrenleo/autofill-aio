@@ -17,7 +17,7 @@ async function runAutofill() {
   const email = customToggleOn
     ? details.email
     : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-        5
+        5,
       )}${generateRandomNumbers(5)}@sagimail.com`;
 
   waitForElement(".mx-name-input_card_number", (selector) => {
@@ -31,7 +31,7 @@ async function runAutofill() {
     inputElement.focus();
     fillInput(
       inputElement,
-      `${details.cardExpiryMonth}/${details.cardExpiryYear}`
+      `${details.cardExpiryMonth}/${details.cardExpiryYear}`,
     );
   });
 

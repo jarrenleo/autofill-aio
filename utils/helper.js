@@ -1,5 +1,5 @@
 function generateRandomAreaCodeNumber() {
-  const areaCodes = ["012", "013", "016", "017", "019"];
+  const areaCodes = ["012", "013", "016", "019"];
 
   return areaCodes[Math.floor(Math.random() * areaCodes.length)];
 }

@@ -24,7 +24,7 @@ async function runAutofill() {
   const email = customToggleOn
     ? details.email
     : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-        5
+        5,
       )}${generateRandomNumbers(5)}@sagimail.com`;
 
   waitForElement("input[id='tel-cardNumber']", (selector) => {

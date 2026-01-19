@@ -42,14 +42,14 @@ async function runAutofill() {
 
   waitForCustomElement("li.select2-results__option", cardType, (option) =>
     option.dispatchEvent(
-      new MouseEvent("mouseup", { bubbles: true, cancelable: true })
-    )
+      new MouseEvent("mouseup", { bubbles: true, cancelable: true }),
+    ),
   );
 
   waitForElement("span[id='select2-stripe-card-type-container']", (selector) =>
     selector.dispatchEvent(
-      new MouseEvent("mousedown", { bubbles: true, cancelable: true })
-    )
+      new MouseEvent("mousedown", { bubbles: true, cancelable: true }),
+    ),
   );
 
   waitForElement("input[id='acceptcheck']", (selector) => selector.click());

@@ -1,271 +1,337 @@
-// Function to wait for a custom element using MutationObserver
-function waitForCustomElement(textContent, callback) {
+(function () {
+  // Guard against double-loading
+  if (window.__bigtixAutofillLoaded) return;
+  window.__bigtixAutofillLoaded = true;
+
+  // Domain check
+  const ALLOWED_DOMAINS = ["bigtix", "starplanet", "biztmgptix", "bookmyshow"];
   const currentUrl = window.location.href;
-  const allowedDomains = ["bigtix", "starplanet", "biztmgptix", "bookmyshow"];
-  if (!allowedDomains.some((domain) => currentUrl.includes(domain))) return;
+  if (!ALLOWED_DOMAINS.some((domain) => currentUrl.includes(domain))) return;
 
-  const observer = new MutationObserver((_, observer) => {
-    const targetElement = findInputByLabel(textContent);
-    if (targetElement) {
-      observer.disconnect();
-      callback(targetElement);
-    }
-  });
+  // ============================================================================
+  // SELECTORS
+  // ============================================================================
+  const SELECTORS = {
+    // Form inputs
+    fullName: "input[data-test='test-bigtix-booking--patroninfoform-fullName']",
+    email: 'input[data-test="test-bigtix-booking--patroninfoform-email"]',
+    confirmEmail:
+      'input[data-test="test-bigtix-booking--patroninfoform-confirm_email_address"]',
+    phoneCountry:
+      'input[role="combobox"][aria-labelledby="bigtix-formitem__patronInfo-label--phone"]',
+    phoneNumber: 'input[data-test="test-bigtix-booking--patroninfoform-phone"]',
+    consentCheckbox: ".bigtix-checkbox__icon",
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-}
+    // Card inputs
+    cardFirstName:
+      'input[data-test="test-bigtix-booking--creditcardform-firstname"]',
+    cardLastName:
+      'input[data-test="test-bigtix-booking--creditcardform-lastname"]',
+    cardNumber:
+      'input[data-test="test-bigtix-booking--creditcardform-cardnumber"]',
+    cardExpiryMonth: 'input[name="cc-exp-month"]',
+    cardExpiryYear: 'input[name="cc-exp-year"]',
+    cardCvv: 'input[data-test="test-bigtix-booking--creditcardform-cvn"]',
 
-function findLabel(element, textContent) {
-  let selectedLabel;
-  const labels = document.querySelectorAll(element);
+    // UI elements
+    cartSummary: ".bigtix-collapse__header",
+    paymentTabList: 'div[role="tablist"]',
+    paymentMethodTitle: ".bigtix-payment-method__title",
+    nextPageButton: "button[id='bigtix-booking-next-page']",
 
-  for (const label of labels) {
-    if (label.textContent.toLowerCase().includes(textContent.toLowerCase())) {
-      selectedLabel = label;
-      break;
-    }
+    // Custom field selectors
+    formItemLabel: "label.bigtix-formitem__label",
+    formItemField: ".bigtix-formitem__field",
+  };
+
+  // ============================================================================
+  // HELPER FUNCTIONS
+  // ============================================================================
+
+  /**
+   * Finds a label element containing the specified text
+   */
+  function findLabelByText(selector, textContent) {
+    const labels = document.querySelectorAll(selector);
+    return Array.from(labels).find((label) =>
+      label.textContent.toLowerCase().includes(textContent.toLowerCase()),
+    );
   }
 
-  return selectedLabel;
-}
+  /**
+   * Finds an input element by its associated label text
+   */
+  function findInputByLabel(textContent) {
+    const label = findLabelByText(SELECTORS.formItemLabel, textContent);
+    if (!label) return null;
 
-// Function to find an input element by its associated label text content
-function findInputByLabel(textContent) {
-  const selectedLabel = findLabel("label.bigtix-formitem__label", textContent);
-  if (!selectedLabel) return;
+    const formDiv = label.parentElement?.querySelector(SELECTORS.formItemField);
+    if (!formDiv) return null;
 
-  const formDiv = selectedLabel.parentElement.querySelector(
-    ".bigtix-formitem__field"
-  );
-  let inputField = formDiv.querySelector("input");
-  if (!inputField) inputField = formDiv.querySelector("[role='checkbox']");
+    return (
+      formDiv.querySelector("input") ||
+      formDiv.querySelector("[role='checkbox']")
+    );
+  }
 
-  return inputField;
-}
+  /**
+   * Finds a button element containing the specified text
+   */
+  function findButtonByText(selector, textContent) {
+    const buttons = document.querySelectorAll(selector);
+    return Array.from(buttons).find((btn) =>
+      btn.children[0]?.textContent
+        ?.toLowerCase()
+        .includes(textContent.toLowerCase()),
+    );
+  }
 
-// Function to wait and click next page button
-async function selectNextButton(selector) {
-  const checkNextButton = setInterval(() => {
-    const targetElement = document.getElementById(selector);
-    if (!targetElement) return;
+  /**
+   * Waits for a custom element (by label text) using MutationObserver
+   */
+  function waitForCustomElement(textContent, callback) {
+    const observer = new MutationObserver((_, obs) => {
+      const element = findInputByLabel(textContent);
+      if (element) {
+        obs.disconnect();
+        callback(element);
+      }
+    });
 
-    const hasDisabledClasses =
-      targetElement.classList.contains("bigtix-button--disabled") ||
-      targetElement.classList.contains("bigtix-booking-`pagenav-disabled");
-    if (hasDisabledClasses) return;
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 
-    clearInterval(checkNextButton);
-    targetElement.click();
-  }, 500);
-}
-
-// Main function to run the autofill logic
-async function runAutofill() {
-  const result = await chrome.storage.sync.get([
-    "autofillProfiles",
-    "activeProfileName",
-  ]);
-  const profiles = result.autofillProfiles;
-  const activeProfileName = result.activeProfileName;
-
-  if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
-
-  const details = profiles[activeProfileName];
-  const customToggleOn = details.customToggleOn || false;
-
-  const firstName = details.firstName;
-  const lastName = customToggleOn ? details.lastName : generateRandomName();
-  const fullName = `${firstName} ${lastName}`;
-  const email = customToggleOn
-    ? details.email
-    : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-        5
-      )}${generateRandomNumbers(5)}@sagimail.com`;
-  const phoneCountry = customToggleOn ? details.phoneCountry : "Malaysia";
-  const phoneNumber = customToggleOn
-    ? details.phoneNumber
-    : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
-  const ic = customToggleOn ? details.ic : "0000";
-  const nationality = customToggleOn ? details.nationality : "Malaysian";
-
-  // Full Name
-  waitForElement(
-    "input[data-test='test-bigtix-booking--patroninfoform-fullName']",
-    (selector) => fillInput(selector, fullName)
-  );
-
-  // Email
-  waitForElement(
-    'input[data-test="test-bigtix-booking--patroninfoform-email"]',
-    (selector) => fillInput(selector, email)
-  );
-
-  // Confirm Email
-  waitForElement(
-    'input[data-test="test-bigtix-booking--patroninfoform-confirm_email_address"]',
-    (selector) => fillInput(selector, email)
-  );
-
-  // Country
-  waitForElement(
-    'input[role="combobox"][aria-labelledby="bigtix-formitem__patronInfo-label--phone"]',
-    (selector) => {
-      const combobox = selector;
-      combobox.focus();
-      fillInput(combobox, phoneCountry);
-
-      waitForElement(`div[label="${phoneCountry}"]`, (selector) => {
-        selector.click();
-        combobox.blur();
-      });
-    }
-  );
-
-  // Phone Number
-  waitForElement(
-    'input[data-test="test-bigtix-booking--patroninfoform-phone"]',
-    (selector) => fillInput(selector, phoneNumber)
-  );
-
-  // Consent Checkbox
-  waitForElement(".bigtix-checkbox__icon", (selector) => {
-    if (selector.getAttribute("aria-checked") === "false") selector.click();
-  });
-
-  // Custom Fields
-
-  // NRIC
-  waitForCustomElement("Malaysian NRIC", (selector) => fillInput(selector, ic));
-
-  // Nationality
-  waitForCustomElement("Nationality", (selector) => {
-    const combobox = selector;
+  /**
+   * Selects an option from a combobox dropdown
+   */
+  function selectComboboxOption(combobox, optionText) {
     combobox.focus();
-    fillInput(combobox, nationality);
+    fillInput(combobox, optionText);
 
-    waitForElement(`div[label="${nationality}"]`, (selector) => {
-      selector.click();
+    waitForElement(`div[label="${optionText}"]`, (option) => {
+      option.click();
       combobox.blur();
     });
-  });
+  }
 
-  // Place of Residence
-  waitForCustomElement("Place of Residence", (selector) => {
-    const combobox = selector;
-    combobox.focus();
-    fillInput(combobox, phoneCountry);
+  /**
+   * Polls for a button and clicks it with retry limit
+   */
+  function pollAndClickButton(buttonText, maxAttempts = 3) {
+    let attempts = 0;
 
-    waitForElement(`div[label="${phoneCountry}"]`, (selector) => {
-      selector.click();
-      combobox.blur();
+    const pollInterval = setInterval(() => {
+      if (attempts >= maxAttempts) {
+        clearInterval(pollInterval);
+        return;
+      }
+
+      const button = findButtonByText(SELECTORS.nextPageButton, buttonText);
+      if (button) {
+        button.click();
+        attempts++;
+      }
+    }, 500);
+  }
+
+  // ============================================================================
+  // PROFILE DATA GENERATION
+  // ============================================================================
+
+  /**
+   * Generates profile data based on settings
+   */
+  function generateProfileData(details) {
+    const customToggleOn = details.customToggleOn || false;
+
+    const firstName = details.firstName;
+    const lastName = customToggleOn ? details.lastName : generateRandomName();
+    const fullName = `${firstName} ${lastName}`;
+
+    return {
+      firstName,
+      lastName,
+      fullName,
+      email: customToggleOn
+        ? details.email
+        : `${fullName
+            .split(" ")
+            .join(".")
+            .toLowerCase()}.${generateRandomLetters(5)}${generateRandomNumbers(
+            5,
+          )}@sagimail.com`,
+      phoneCountry: customToggleOn ? details.phoneCountry : "Malaysia",
+      phoneNumber: customToggleOn
+        ? details.phoneNumber
+        : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`,
+      ic: customToggleOn ? details.ic : "0000",
+      nationality: customToggleOn ? details.nationality : "Malaysian",
+      cardType: details.cardType,
+      cardNumber: details.cardNumber,
+      cardExpiryMonth: details.cardExpiryMonth,
+      cardExpiryYear: details.cardExpiryYear,
+      cardCvv: details.cardCvv,
+    };
+  }
+
+  // ============================================================================
+  // FORM FILLING FUNCTIONS
+  // ============================================================================
+
+  /**
+   * Fills the patron information form
+   */
+  function fillPatronInfoForm(data) {
+    // Full Name
+    waitForElement(SELECTORS.fullName, (el) => fillInput(el, data.fullName));
+
+    // Email
+    waitForElement(SELECTORS.email, (el) => fillInput(el, data.email));
+
+    // Confirm Email
+    waitForElement(SELECTORS.confirmEmail, (el) => fillInput(el, data.email));
+
+    // Phone Country
+    waitForElement(SELECTORS.phoneCountry, (el) =>
+      selectComboboxOption(el, data.phoneCountry),
+    );
+
+    // Phone Number
+    waitForElement(SELECTORS.phoneNumber, (el) =>
+      fillInput(el, data.phoneNumber),
+    );
+
+    // Consent Checkbox
+    waitForElement(SELECTORS.consentCheckbox, (el) => {
+      if (el.getAttribute("aria-checked") === "false") el.click();
     });
-  });
+  }
 
-  // Age Range
-  waitForCustomElement("Age Range", (selector) => {
-    const combobox = selector;
-    combobox.focus();
-    fillInput(combobox, "below 21");
+  /**
+   * Fills custom fields (NRIC, Nationality, etc.)
+   */
+  function fillCustomFields(data) {
+    // NRIC
+    waitForCustomElement("Malaysian NRIC", (el) => fillInput(el, data.ic));
 
-    waitForElement(`div[label="below 21"]`, (selector) => {
-      selector.click();
-      combobox.blur();
+    // Nationality
+    waitForCustomElement("Nationality", (el) =>
+      selectComboboxOption(el, data.nationality),
+    );
+
+    // Place of Residence
+    waitForCustomElement("Place of Residence", (el) =>
+      selectComboboxOption(el, data.phoneCountry),
+    );
+
+    // Age Range
+    waitForCustomElement("Age Range", (el) =>
+      selectComboboxOption(el, "below 21"),
+    );
+
+    // Gender
+    waitForCustomElement("Gender", (el) =>
+      selectComboboxOption(el, "Prefer not to say"),
+    );
+
+    // National ID / Passport
+    waitForCustomElement("National Identification Card / Passport", (el) =>
+      fillInput(el, data.ic),
+    );
+
+    // Acknowledgement
+    waitForCustomElement("Acknowledgement", (el) => {
+      if (el.getAttribute("aria-checked") !== "true") el.click();
     });
-  });
+  }
 
-  // Gender
-  waitForCustomElement("Gender", (selector) => {
-    const combobox = selector;
-    combobox.focus();
-    fillInput(combobox, "Prefer not to say");
+  /**
+   * Handles cart summary and confirmation
+   */
+  function handleCartSummary() {
+    waitForElement(SELECTORS.cartSummary, async (el) => {
+      if (el.getAttribute("aria-expanded") !== "true") {
+        el.click();
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
 
-    waitForElement(`div[label="Prefer not to say"]`, (selector) => {
-      selector.click();
-      combobox.blur();
+      chrome.runtime.sendMessage({ action: "screenshot" });
+      pollAndClickButton("Confirm details");
     });
-  });
+  }
 
-  // National Identification Card / Passport
-  waitForCustomElement("National Identification Card / Passport", (selector) =>
-    fillInput(selector, ic)
-  );
-
-  // Acknowledgement
-  waitForCustomElement("Acknowledgement", (selector) => {
-    if (selector.getAttribute("aria-checked") === "false") selector.click();
-  });
-
-  // Cart Summary
-  waitForElement(".bigtix-collapse__header", async (selector) => {
-    if (selector.getAttribute("aria-expanded") === "true") return;
-
-    selector.click();
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    chrome.runtime.sendMessage({ action: "screenshot" });
-
-    // To Payment Page
-    selectNextButton("bigtix-booking-next-page");
-
-    // Payment Method
-    waitForElement(`div[role="tablist"]`, () => {
-      const selectedLabel = findLabel(
-        ".bigtix-payment-method__title",
-        details.cardType
+  /**
+   * Fills the payment card form
+   */
+  function fillCardForm(data) {
+    // Select payment method
+    waitForElement(SELECTORS.paymentTabList, () => {
+      const paymentLabel = findLabelByText(
+        SELECTORS.paymentMethodTitle,
+        data.cardType,
       );
-      if (!selectedLabel) return;
+      if (!paymentLabel) return;
 
-      const paymentMethodContainer = selectedLabel.closest(
-        'div[class="rc-collapse-header"]'
+      const paymentContainer = paymentLabel.closest(
+        'div[class="rc-collapse-header"]',
       );
-      paymentMethodContainer.click();
+      paymentContainer?.click();
     });
 
-    // Card First Name
-    waitForElement(
-      'input[data-test="test-bigtix-booking--creditcardform-firstname"]',
-      (selector) => fillInput(selector, firstName)
+    // Card details
+    waitForElement(SELECTORS.cardFirstName, (el) =>
+      fillInput(el, data.firstName),
     );
-
-    // Card Last Name
-    waitForElement(
-      'input[data-test="test-bigtix-booking--creditcardform-lastname"]',
-      (selector) => fillInput(selector, lastName)
+    waitForElement(SELECTORS.cardLastName, (el) =>
+      fillInput(el, data.lastName),
     );
-
-    // Card Number
-    waitForElement(
-      'input[data-test="test-bigtix-booking--creditcardform-cardnumber"]',
-      (selector) => fillInput(selector, details.cardNumber)
+    waitForElement(SELECTORS.cardNumber, (el) =>
+      fillInput(el, data.cardNumber),
     );
-
-    // Card Expiry Month
-    waitForElement('input[name="cc-exp-month"]', (selector) =>
-      fillInput(selector, details.cardExpiryMonth)
+    waitForElement(SELECTORS.cardExpiryMonth, (el) =>
+      fillInput(el, data.cardExpiryMonth),
     );
-
-    // Card Expiry Year
-    waitForElement('input[name="cc-exp-year"]', (selector) =>
-      fillInput(selector, details.cardExpiryYear)
+    waitForElement(SELECTORS.cardExpiryYear, (el) =>
+      fillInput(el, data.cardExpiryYear),
     );
+    waitForElement(SELECTORS.cardCvv, (el) => fillInput(el, data.cardCvv));
+  }
 
-    // Card CVV
-    waitForElement(
-      'input[data-test="test-bigtix-booking--creditcardform-cvn"]',
-      (selector) => fillInput(selector, details.cardCvv)
-    );
-
+  /**
+   * Handles the final pay button if enabled
+   */
+  function handlePayButton() {
     chrome.storage.sync.get("toPayEnabled", (result) => {
       const toPayEnabled =
         result.toPayEnabled !== undefined ? result.toPayEnabled : true;
-
-      if (toPayEnabled) selectNextButton("bigtix-booking-next-page");
+      if (toPayEnabled) {
+        pollAndClickButton("Pay");
+      }
     });
-  });
-}
+  }
 
-runAutofill();
+  // ============================================================================
+  // MAIN AUTOFILL FUNCTION
+  // ============================================================================
+
+  async function runAutofill() {
+    const result = await chrome.storage.sync.get([
+      "autofillProfiles",
+      "activeProfileName",
+    ]);
+    const { autofillProfiles: profiles, activeProfileName } = result;
+
+    if (!profiles || !activeProfileName || !profiles[activeProfileName]) return;
+
+    const profileData = generateProfileData(profiles[activeProfileName]);
+
+    // Fill forms
+    fillPatronInfoForm(profileData);
+    fillCustomFields(profileData);
+    handleCartSummary();
+    fillCardForm(profileData);
+    handlePayButton();
+  }
+
+  runAutofill();
+})();

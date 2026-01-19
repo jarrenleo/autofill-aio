@@ -1,4 +1,4 @@
-(() => {
+(function () {
   if (window.__bmsAutofillLoaded) return;
   window.__bmsAutofillLoaded = true;
 
@@ -42,7 +42,7 @@
     const { overflow, overflowY, overflowX } = style;
 
     const hasScrollableOverflow = ["scroll", "auto"].some(
-      (val) => overflow === val || overflowY === val || overflowX === val
+      (val) => overflow === val || overflowY === val || overflowX === val,
     );
 
     const hasScrollableContent =
@@ -64,7 +64,6 @@
 
   let hasClickedConfirmQuantity = false;
   let hasClickedConfirmSelection = false;
-  let hasClickedCheckout = false;
 
   async function runAutofill() {
     const result = await chrome.storage.sync.get([
@@ -101,7 +100,7 @@
         async (selector) => {
           await new Promise((resolve) => setTimeout(resolve, 500));
           selector.click();
-        }
+        },
       );
     }
 
@@ -111,7 +110,7 @@
       const pollInterval = setInterval(async () => {
         const button = findElement(
           "button[id='bigtix-booking-next-page']",
-          "Confirm selection"
+          "Confirm selection",
         );
         if (!button) return;
 
@@ -120,19 +119,6 @@
           button.click();
         }
       }, 500);
-    }
-
-    if (!hasClickedCheckout) {
-      hasClickedCheckout = true;
-
-      waitForCustomElement(
-        "button.bigtix-checkout_shopping_cart_sticky_checkout_card_next_button",
-        "Checkout",
-        async (selector) => {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          selector.click();
-        }
-      );
     }
   }
 

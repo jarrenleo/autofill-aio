@@ -49,7 +49,7 @@ async function runAutofill() {
         async (selector) => {
           await new Promise((resolve) => setTimeout(resolve, 300));
           selector.click();
-        }
+        },
       );
   });
 }
