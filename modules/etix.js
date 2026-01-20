@@ -61,6 +61,11 @@
     const ic = customToggleOn ? details.ic : "0000";
     const quantity = details.quantity || 1;
 
+    chrome.storage.local.set({
+      generatedPhoneNumber: phoneNumber,
+      generatedFullName: fullName,
+    });
+
     waitForElement("path[fill='#F27F4A']", (selector) => {
       for (let i = 0; i < quantity; i++) {
         selector.parentElement.parentElement.click();

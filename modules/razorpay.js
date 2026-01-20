@@ -35,50 +35,71 @@
 
     const details = profiles[activeProfileName];
 
-    const firstName = details.firstName;
-    const lastName = details.lastName ? details.lastName : generateRandomName();
-    const fullName = `${firstName} ${lastName}`;
+    const { generatedPhoneNumber, generatedFullName } =
+      await chrome.storage.local.get([
+        "generatedPhoneNumber",
+        "generatedFullName",
+      ]);
 
-    waitForElement("div[data-value='card']", async (selector) => {
-      selector.click();
+    waitForElement(
+      "button[data-testid='contact-sidebar-widget']",
+      (selector) => {
+        selector.click();
 
-      waitForElement("input[name='card.number']", (selector) => {
-        selector.focus();
-        fillInput(selector, details.cardNumber);
-      });
+        waitForElement("input[name='contact']", (selector) => {
+          selector.focus();
+          fillInput(selector, "");
+          fillInput(selector, generatedPhoneNumber);
 
-      waitForElement("input[name='card.expiry']", (selector) => {
-        selector.focus();
-        fillInput(
-          selector,
-          `${details.cardExpiryMonth}/${details.cardExpiryYear}`,
-        );
-      });
+          waitForElement("button[name='button']", (selector) => {
+            selector.click();
 
-      waitForElement("input[name='card.cvv']", (selector) => {
-        selector.focus();
-        fillInput(selector, details.cardCvv);
-      });
-
-      waitForElement("input[name='card.name']", (selector) => {
-        selector.focus();
-        fillInput(selector, fullName);
-      });
-
-      chrome.storage.sync.get("toPayEnabled", (result) => {
-        const toPayEnabled =
-          result.toPayEnabled !== undefined ? result.toPayEnabled : true;
-
-        if (toPayEnabled)
-          waitForElement(
-            "button[data-test-id='add-card-cta']",
-            async (selector) => {
-              await new Promise((resolve) => setTimeout(resolve, 300));
+            waitForElement("div[data-value='card']", async (selector) => {
               selector.click();
-            },
-          );
-      });
-    });
+
+              waitForElement("input[name='card.number']", (selector) => {
+                selector.focus();
+                fillInput(selector, details.cardNumber);
+              });
+
+              waitForElement("input[name='card.expiry']", (selector) => {
+                selector.focus();
+                fillInput(
+                  selector,
+                  `${details.cardExpiryMonth}/${details.cardExpiryYear}`,
+                );
+              });
+
+              waitForElement("input[name='card.cvv']", (selector) => {
+                selector.focus();
+                fillInput(selector, details.cardCvv);
+              });
+
+              waitForElement("input[name='card.name']", (selector) => {
+                selector.focus();
+                fillInput(selector, generatedFullName);
+              });
+
+              chrome.storage.sync.get("toPayEnabled", (result) => {
+                const toPayEnabled =
+                  result.toPayEnabled !== undefined
+                    ? result.toPayEnabled
+                    : true;
+
+                if (toPayEnabled)
+                  waitForElement(
+                    "button[data-test-id='add-card-cta']",
+                    async (selector) => {
+                      await new Promise((resolve) => setTimeout(resolve, 300));
+                      selector.click();
+                    },
+                  );
+              });
+            });
+          });
+        });
+      },
+    );
   }
 
   runAutofill();
