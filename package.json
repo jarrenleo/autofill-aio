@@ -1,6 +1,6 @@
 {
   "name": "autofill-aio",
-  "version": "1.4.1",
+  "version": "1.5.5",
   "main": "content.js",
   "type": "module",
   "scripts": {

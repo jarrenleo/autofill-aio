@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Autofill AIO",
-  "version": "1.4.1",
+  "version": "1.5.5",
   "description": "Chrome extension that autofills checkout forms",
   "permissions": ["storage", "scripting", "tabs", "activeTab", "downloads"],
   "host_permissions": ["<all_urls>"],
@@ -13,7 +13,12 @@
     },
     {
       "matches": ["https://api.razorpay.com/*"],
-      "js": ["utils/names_array.js", "utils/helper.js", "modules/razorpay.js"],
+      "js": [
+        "utils/names_array.js",
+        "utils/emails_array.js",
+        "utils/helper.js",
+        "modules/razorpay.js"
+      ],
       "all_frames": true,
       "run_at": "document_idle"
     }

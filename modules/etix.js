@@ -50,14 +50,13 @@
     const firstName = details.firstName;
     const lastName = customToggleOn ? details.lastName : generateRandomName();
     const fullName = `${firstName} ${lastName}`;
-    const email = customToggleOn
-      ? details.email
-      : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-          5,
-        )}${generateRandomNumbers(5)}@sagimail.com`;
+    const generatedEmail = `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5,
+    )}${generateRandomNumbers(5)}${getRandomEmail()}`;
+    const email = getEmailFromProfile(details, generatedEmail);
     const phoneNumber = customToggleOn
       ? details.phoneNumber
-      : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
+      : `${getRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
     const ic = customToggleOn ? details.ic : "0000";
     const quantity = details.quantity || 1;
 

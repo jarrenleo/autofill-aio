@@ -1,10 +1,10 @@
 const allowedUrlPatterns = [
   /^https:\/\/.*\.bigtix\.io\/booking\/.*/,
   /^https:\/\/.*\.bigtix\.io\/checkout\/patron/,
-  /^https:\/\/.*\.bigtix\.io\/checkout\/payment/,
+  /^https:\/\/.*\.bigtix\.io\/checkout\/payment(?!\/success)/,
   /^https:\/\/.*\.bookmyshow\.com\/booking\/.*/,
   /^https:\/\/.*\.bookmyshow\.com\/checkout\/patron/,
-  /^https:\/\/.*\.bookmyshow\.com\/checkout\/payment/,
+  /^https:\/\/.*\.bookmyshow\.com\/checkout\/payment(?!\/success)/,
   /^https:\/\/.*\.reddotpayment\.com\/link\/payment\/.*/,
   /^https:\/\/pgw-ui\.2c2p\.com\/payment\/.*/,
   /^https:\/\/.*\.ticket2u\.com\.my\/cartv2\/.*/,
@@ -12,6 +12,7 @@ const allowedUrlPatterns = [
   /^https:\/\/.*\.sistic\.com\.sg\/sistic\/confirm\/shoppingcart/,
   /^https:\/\/checkout\.stripe\.com\/c\/pay\/.*/,
   /^https:\/\/booking\.etix\.my\/Event\/.*/,
+  /^https:\/\/secured-bot\.com\/etix\/.*/,
 ];
 
 function findUrlPatternIndex(url) {
@@ -33,43 +34,49 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     case 6:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/reddot.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/reddot.js"],
       });
       break;
     case 7:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/pgw.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/pgw.js"],
       });
       break;
     case 8:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/t2u.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/t2u.js"],
       });
       break;
     case 9:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/op.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/op.js"],
       });
       break;
     case 10:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/helper.js", "modules/sistic.js"],
+        files: ["utils/emails_array.js", "utils/helper.js", "modules/sistic.js"],
       });
       break;
     case 11:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/stripe.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/stripe.js"],
       });
       break;
     case 12:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/helper.js", "modules/etix.js"],
+        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/etix.js"],
+      });
+      break;
+    case 13:
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ["utils/emails_array.js", "utils/helper.js", "modules/secured-bot.js"],
       });
       break;
     default:
@@ -77,6 +84,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         target: { tabId: tabId },
         files: [
           "utils/names_array.js",
+          "utils/emails_array.js",
           "utils/helper.js",
           "modules/bms.js",
           "modules/bigtix.js",

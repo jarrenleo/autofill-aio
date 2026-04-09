@@ -49,14 +49,18 @@
     const firstName = details.firstName;
     const lastName = customToggleOn ? details.lastName : generateRandomName();
     const fullName = `${firstName} ${lastName}`;
-    const email = customToggleOn
-      ? details.email
-      : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-          5,
-        )}${generateRandomNumbers(5)}@sagimail.com`;
+    
+    // Generate fallback email (used when custom toggle is off)
+    const generatedEmail = `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5,
+    )}${generateRandomNumbers(5)}${getRandomEmail()}`;
+    
+    // Get the appropriate email based on profile settings
+    const email = getEmailFromProfile(details, generatedEmail);
+    
     const phoneNumber = customToggleOn
       ? details.phoneNumber
-      : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
+      : `${getRandomAreaCodeNumber()}${generateRandomNumbers(7)}`;
     const ic = customToggleOn ? details.ic : "0000";
 
     waitForElement("input[label='Name']", (selector) =>

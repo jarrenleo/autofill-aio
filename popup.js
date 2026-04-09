@@ -2,7 +2,8 @@ const quantityInput = document.getElementById("quantity");
 
 const firstNameInput = document.getElementById("firstName");
 const lastNameInput = document.getElementById("lastName");
-const emailInput = document.getElementById("email");
+const emailInfo = document.getElementById("emailInfo");
+const useEmailListToggle = document.getElementById("useEmailListToggle");
 const phoneCountryInput = document.getElementById("phoneCountry");
 const phoneNumberInput = document.getElementById("phoneNumber");
 const icInput = document.getElementById("ic");
@@ -27,6 +28,31 @@ const lastNameDiv = document.getElementById("lastNameDiv");
 const exportProfilesBtn = document.getElementById("exportProfilesBtn");
 const importProfilesBtn = document.getElementById("importProfilesBtn");
 const importProfilesInput = document.getElementById("importProfilesInput");
+
+// Toggle email info text
+function toggleEmailList(useList) {
+  emailInfo.textContent = useList
+    ? "Using iCloud email"
+    : "Using catch-all email";
+  useEmailListToggle.checked = useList;
+}
+
+// Handle email list toggle
+useEmailListToggle.addEventListener("change", () => {
+  toggleEmailList(useEmailListToggle.checked);
+
+  // Save the toggle state to the current profile
+  const activeProfileName = profileSelect.value;
+  if (activeProfileName) {
+    chrome.storage.sync.get("autofillProfiles", (result) => {
+      let profiles = result.autofillProfiles || {};
+      const profileData = profiles[activeProfileName] || {};
+      profileData.useEmailList = useEmailListToggle.checked;
+      profiles[activeProfileName] = profileData;
+      chrome.storage.sync.set({ autofillProfiles: profiles });
+    });
+  }
+});
 
 // Function to get profile display name with indicator
 function getProfileDisplayName(profileName, profiles) {
@@ -69,7 +95,7 @@ customDetailsToggle.addEventListener("change", () => {
           profileSelect.options[profileSelect.selectedIndex];
         selectedOption.textContent = getProfileDisplayName(
           activeProfileName,
-          profiles
+          profiles,
         );
       });
     });
@@ -81,7 +107,7 @@ function loadProfileData(profileDetails) {
   quantityInput.value = profileDetails?.quantity || 1;
   firstNameInput.value = profileDetails?.firstName || "";
   lastNameInput.value = profileDetails?.lastName || "";
-  emailInput.value = profileDetails?.email || "";
+  // emailInput was removed - email is now handled by the email list toggle
   phoneCountryInput.value = profileDetails?.phoneCountry || "";
   phoneNumberInput.value = profileDetails?.phoneNumber || "";
   icInput.value = profileDetails?.ic || "";
@@ -95,6 +121,10 @@ function loadProfileData(profileDetails) {
   // Set the custom details toggle based on the profile's customToggleOn state
   const customToggleOn = profileDetails?.customToggleOn || false;
   toggleCustomDetailsSection(customToggleOn);
+
+  // Set the email list toggle
+  const useEmailList = profileDetails?.useEmailList || false;
+  toggleEmailList(useEmailList);
 }
 
 // Load profiles and active profile when popup opens
@@ -144,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       activeProfileName && profiles[activeProfileName]
         ? loadProfileData(profiles[activeProfileName])
         : loadProfileData({});
-    }
+    },
   );
 });
 
@@ -184,7 +214,7 @@ saveButton.addEventListener("click", () => {
     quantity: parseInt(quantityInput.value, 10) || 1,
     firstName: firstNameInput.value,
     lastName: lastNameInput.value,
-    email: emailInput.value,
+    useEmailList: useEmailListToggle.checked,
     phoneCountry: phoneCountryInput.value,
     phoneNumber: phoneNumberInput.value,
     ic: icInput.value,
@@ -229,7 +259,7 @@ newProfileBtn.addEventListener("click", () => {
     if (profiles[trimmedName]) {
       if (
         confirm(
-          `Profile "${trimmedName}" already exists. Choose another profile name.`
+          `Profile "${trimmedName}" already exists. Choose another profile name.`,
         )
       )
         return;
@@ -245,7 +275,7 @@ newProfileBtn.addEventListener("click", () => {
         // Update dropdown
         // Check if option already exists (in case of overwrite confirmation)
         let existingOption = profileSelect.querySelector(
-          `option[value="${trimmedName}"]`
+          `option[value="${trimmedName}"]`,
         );
         if (!existingOption) {
           const option = document.createElement("option");
@@ -263,7 +293,7 @@ newProfileBtn.addEventListener("click", () => {
         setTimeout(() => {
           statusDiv.textContent = "";
         }, 3000);
-      }
+      },
     );
   });
 });
@@ -339,7 +369,7 @@ importProfilesInput.addEventListener("change", (event) => {
               }, 3000);
             });
           });
-        }
+        },
       );
     } catch (err) {
       alert("Failed to import profiles: Invalid JSON file.");
@@ -360,7 +390,7 @@ deleteProfileBtn.addEventListener("click", () => {
   // Confirmation dialog
   if (
     !confirm(
-      `Are you sure you want to delete the profile "${profileNameToDelete}"? This cannot be undone.`
+      `Are you sure you want to delete the profile "${profileNameToDelete}"? This cannot be undone.`,
     )
   ) {
     return; // User cancelled
@@ -413,7 +443,7 @@ deleteProfileBtn.addEventListener("click", () => {
         setTimeout(() => {
           statusDiv.textContent = "";
         }, 3000);
-      }
+      },
     );
   });
 });

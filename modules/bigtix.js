@@ -1,5 +1,4 @@
 (function () {
-  // Guard against double-loading
   if (window.__bigtixAutofillLoaded) return;
   window.__bigtixAutofillLoaded = true;
 
@@ -152,18 +151,16 @@
       firstName,
       lastName,
       fullName,
-      email: customToggleOn
-        ? details.email
-        : `${fullName
+      email: getEmailFromProfile(details, `${fullName
             .split(" ")
             .join(".")
             .toLowerCase()}.${generateRandomLetters(5)}${generateRandomNumbers(
             5,
-          )}@sagimail.com`,
+          )}${getRandomEmail()}`),
       phoneCountry: customToggleOn ? details.phoneCountry : "Malaysia",
       phoneNumber: customToggleOn
         ? details.phoneNumber
-        : `${generateRandomAreaCodeNumber()}${generateRandomNumbers(7)}`,
+        : `${getRandomAreaCodeNumber()}${generateRandomNumbers(7)}`,
       ic: customToggleOn ? details.ic : "0000",
       nationality: customToggleOn ? details.nationality : "Malaysian",
       cardType: details.cardType,

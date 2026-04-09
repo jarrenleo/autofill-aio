@@ -14,11 +14,10 @@ async function runAutofill() {
   const firstName = details.firstName;
   const lastName = customToggleOn ? details.lastName : generateRandomName();
   const fullName = `${firstName} ${lastName}`;
-  const email = customToggleOn
-    ? details.email
-    : `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
-        5,
-      )}${generateRandomNumbers(5)}@sagimail.com`;
+  const generatedEmail = `${fullName.split(" ").join(".").toLowerCase()}.${generateRandomLetters(
+      5,
+    )}${generateRandomNumbers(5)}${getRandomEmail()}`;
+  const email = getEmailFromProfile(details, generatedEmail);
 
   waitForElement(".mx-name-input_card_number", (selector) => {
     const inputElement = selector.querySelector("input");

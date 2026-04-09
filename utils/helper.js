@@ -1,4 +1,10 @@
-function generateRandomAreaCodeNumber() {
+function getRandomEmail() {
+  const emails = ["@sagimail.com", "@jfai.xyz", "@jfgroupe.com"];
+
+  return emails[Math.floor(Math.random() * emails.length)];
+}
+
+function getRandomAreaCodeNumber() {
   const areaCodes = ["012", "013", "016", "019"];
 
   return areaCodes[Math.floor(Math.random() * areaCodes.length)];
@@ -7,6 +13,17 @@ function generateRandomAreaCodeNumber() {
 // Generate a random name from the names array
 function generateRandomName() {
   return window.names[Math.floor(Math.random() * window.names.length)];
+}
+
+// Get email based on profile settings (independent of custom toggle)
+// Toggle OFF = use generated random email (fallbackEmail)
+// Toggle ON  = random iCloud email from emails_array.js
+function getEmailFromProfile(details, fallbackEmail) {
+  const useEmailList = details.useEmailList || false;
+
+  if (!useEmailList) return fallbackEmail;
+
+  return window.emails[Math.floor(Math.random() * window.emails.length)];
 }
 
 // Function to generate a random string of letters
@@ -35,6 +52,12 @@ function generateRandomNumbers(length) {
 
 // Function to wait for an element using MutationObserver
 function waitForElement(selector, callback) {
+  const existingElement = document.querySelector(selector);
+  if (existingElement) {
+    callback(existingElement);
+    return;
+  }
+
   const observer = new MutationObserver((_, observer) => {
     const targetElement = document.querySelector(selector);
     if (targetElement) {
