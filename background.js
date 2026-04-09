@@ -13,6 +13,8 @@ const allowedUrlPatterns = [
   /^https:\/\/checkout\.stripe\.com\/c\/pay\/.*/,
   /^https:\/\/booking\.etix\.my\/Event\/.*/,
   /^https:\/\/secured-bot\.com\/etix\/.*/,
+  /^https:\/\/.*\.bigtix\.io\/checkout\/payment\/success.*/,
+  /^https:\/\/.*\.bookmyshow\.com\/checkout\/payment\/success.*/,
 ];
 
 function findUrlPatternIndex(url) {
@@ -34,49 +36,94 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     case 6:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/reddot.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/reddot.js",
+        ],
       });
       break;
     case 7:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/pgw.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/pgw.js",
+        ],
       });
       break;
     case 8:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/t2u.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/t2u.js",
+        ],
       });
       break;
     case 9:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/op.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/op.js",
+        ],
       });
       break;
     case 10:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/emails_array.js", "utils/helper.js", "modules/sistic.js"],
+        files: [
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/sistic.js",
+        ],
       });
       break;
     case 11:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/stripe.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/stripe.js",
+        ],
       });
       break;
     case 12:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/names_array.js", "utils/emails_array.js", "utils/helper.js", "modules/etix.js"],
+        files: [
+          "utils/names_array.js",
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/etix.js",
+        ],
       });
       break;
     case 13:
       chrome.scripting.executeScript({
         target: { tabId: tabId },
-        files: ["utils/emails_array.js", "utils/helper.js", "modules/secured-bot.js"],
+        files: [
+          "utils/emails_array.js",
+          "utils/helper.js",
+          "modules/secured-bot.js",
+        ],
+      });
+      break;
+    case 14:
+    case 15:
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ["modules/bigtix-success.js"],
       });
       break;
     default:
